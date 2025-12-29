@@ -72,4 +72,8 @@ def get_calendar_service():
         
     return build("calendar", "v3", credentials=creds)
 
-            
+
+def calculate_first_occurence(term_start_str, weekday_name):
+    term_start = datetime.strptime(term_start_str, "%Y-%m-%d").date()
+    
+                
