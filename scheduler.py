@@ -33,4 +33,43 @@ def load_config():
     
     with open(CONFIG_FILE, "r") as f:
         return json.load(f)
+
+
+DAY_TO_INT = {
+    "Monday": 0,
+    "Tuesday": 1,
+    "Wednesday": 2,
+    "Thursday": 3,
+    "Friday": 4,
+    "Saturday": 5,
+    "Sunday": 6
+}
+
+def get_calendar_service():
+    creds = None
     
+    if os.path.exists(TOKEN_FILE):
+        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+    
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            try:
+                creds.refresh(Request())
+            except Exception:
+                os.remove(TOKEN_FILE)
+                return get_calendar_service()
+        else:
+            if not os.path.exists(CREDENTIALS_FILE):
+                print(f"Credentials file '{CREDENTIALS_FILE}' not found.")
+                print("Please download your OAuth credintials from Google Cloud Console.")
+                sys.exit(1)
+        
+        flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+        creds = flow.run_local_server(port=0)
+        
+        with open(TOKEN_FILE, "w") as token:
+            token.write(creds.to_json())
+        
+    return build("calendar", "v3", credentials=creds)
+
+            
