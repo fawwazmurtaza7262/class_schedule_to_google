@@ -76,4 +76,15 @@ def get_calendar_service():
 def calculate_first_occurence(term_start_str, weekday_name):
     term_start = datetime.strptime(term_start_str, "%Y-%m-%d").date()
     
+    target_weekday = DAY_TO_INT.get(weekday_name)
+    if target_weekday is None:
+        raise ValueError(f"Invalid weekday name: {weekday_name}")
+    
+    delta_days = {target_weekday - term_start.weekday()} % 7
+    return term_start + timedelta(days=delta_days)
+
+
+
+
+    
                 
